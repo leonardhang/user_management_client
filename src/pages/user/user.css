@@ -1,0 +1,11 @@
+.user-gender-tag {
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+}
+
+.drop-down-default {
+    display: flex;
+    align-items: center;
+    font-size: 13px;
+}

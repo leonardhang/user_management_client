@@ -1,0 +1,52 @@
+.login-container {
+    width: 100vw;
+    height: 100vh;
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    display: flex;
+}
+.login-form-container {
+    position: absolute;
+    width: 400px;
+    height: 500px;
+    right: 100px;
+    top: 50%;
+    transform: translateY(-50%);
+    background-color: rgba(235, 235, 235, 0.6);
+    border-radius: 8px;
+    padding: 50px;
+}
+
+.login-form-container .login-form-logo {
+    width: 75px;
+    height: 75px;
+}
+
+.login-form-container .login-form-title {
+    font-size: 1.5em;
+    font-weight: 400;
+    color: #242424;
+    margin: 0 0 20px 0;
+}
+
+.login-form-container .btn-submit {
+    width: 100%;
+}
+
+.login-form-container .login-form-forgot {
+    text-align: center;
+    font-size: 12px;
+    text-decoration: underline;
+    cursor: pointer;
+}
+
+.login-form-footer {
+    text-align: center;
+    font-size: 12px;
+    text-decoration: underline;
+    cursor: pointer;
+}
+a {
+    color: rgb(23, 131, 231);
+}

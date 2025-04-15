@@ -1,0 +1,20 @@
+.header-left {
+    display: flex;
+    align-items: center;
+    width: 50%;
+    text-align: left;
+}
+.header-left .header-logo {
+    width: 30px;
+    height: 30px;
+}
+.logo-system-name {
+    font-size: 20px;
+    font-weight: 600;
+    margin-left: 10px;
+    color: #FFFFFF;
+}
+.header-right {
+    width: 50%;
+    text-align: right;
+}
