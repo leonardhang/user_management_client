@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { UserOutlined, LockOutlined } from '@ant-design/icons';
 import { Button, Checkbox, Form, Input, Flex } from 'antd';
 import { login } from '../../services/authService';
@@ -11,14 +11,17 @@ type FieldType = {
 };
 
 const LoginForm: React.FC = () => {
-const navigate = useNavigate();
+    const [loginResult, setLoginResult] = useState<string>("");
+    const navigate = useNavigate();
     const onFinish = (values: any) => {
         console.log('Success:', values);
         login(values.username, values.password).then((res) => {
+            setLoginResult("");
             console.log('Login successful!');
             localStorage.setItem('userinfo', JSON.stringify(res));
             navigate('/');
         }).catch((err) => {
+            setLoginResult(err.response.data);
             console.log(err);
         });
     }
@@ -58,12 +61,21 @@ const navigate = useNavigate();
                         <a href="" className='login-form-forgot'>忘记密码</a>
                     </Flex>
                 </Form.Item>
-
+                
                 <Form.Item>
                     <Button className='btn-submit' type="primary" htmlType="submit">
                         登录
                     </Button>
                 </Form.Item>
+                {
+                    loginResult && 
+                    (
+                        <Form.Item>
+                            <span className='login-err'>{loginResult}</span>
+                        </Form.Item>
+                    )
+                }
+                
             </Form>
         </>
     );

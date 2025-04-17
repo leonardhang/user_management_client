@@ -44,7 +44,7 @@ const RoleForm: React.FC<UserFormProps> = ({ form, open, isNew, targetRole, hide
                             <Form.Item
                                 name="name"
                                 label="角色名"
-                                rules={[{ required: true, message: '请输入新角色名' }]}
+                                rules={[{ required: true, message: '请输入新角色名' }, { type: 'string' }, { whitespace: true, message: '角色名不能包含空格' }]}
                             >
                                 <Input placeholder="请输入新角色名" />
                             </Form.Item>

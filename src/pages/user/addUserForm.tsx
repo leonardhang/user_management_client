@@ -1,14 +1,20 @@
-import React from 'react';
-import { Input, Button, Form, Col, Row, Select, DatePicker, Drawer, FormInstance } from 'antd';
+import React, { useState } from 'react';
+import { Input, Button, Form, Col, Row, Select, DatePicker, Drawer, FormInstance, TreeSelect, TreeDataNode } from 'antd';
 
 interface UserFormProps {
     form: FormInstance
     open: boolean;
+    departmentTree: TreeDataNode[] | [];
     hideAddUserDrawer: () => void;
     onFinish: (values: any) => void;
 }
-const NewUserForm: React.FC<UserFormProps> = ({ form, open, hideAddUserDrawer, onFinish }) => {
-    
+const NewUserForm: React.FC<UserFormProps> = ({ form, open, departmentTree, hideAddUserDrawer, onFinish }) => {
+    const [topDepValue, setValue] = useState<number>(1);
+
+    const onChange = (newValue: number) => {
+        setValue(topDepValue);
+    };
+
     const onFinishFailed = (errorInfo: any) => {
         console.log('Failed:', errorInfo);
     };
@@ -32,7 +38,7 @@ const NewUserForm: React.FC<UserFormProps> = ({ form, open, hideAddUserDrawer, o
                             <Form.Item
                                 name="name"
                                 label="姓名"
-                                rules={[{ required: true, message: '请输入新用户姓名' }]}
+                                rules={[{ required: true, message: '请输入新用户姓名' }, { whitespace: true, message: '用户名不能包含空格' }]}
                             >
                                 <Input placeholder="请输入新用户姓名" />
                             </Form.Item>
@@ -85,9 +91,30 @@ const NewUserForm: React.FC<UserFormProps> = ({ form, open, hideAddUserDrawer, o
                     <Row gutter={16}>
                         <Col span={24}>
                             <Form.Item
+                                name="departmentId"
+                                label="部门"
+                                rules={[{ required: true, message: '请选择部门' }]}
+                            >
+                                <TreeSelect
+                                    showSearch
+                                    style={{ width: '100%' }}
+                                    value={topDepValue}
+                                    dropdownStyle={{ maxHeight: 400, overflow: 'auto' }}
+                                    onChange={onChange}
+                                    placeholder="Please select"
+                                    allowClear
+                                    treeDefaultExpandAll
+                                    treeData={departmentTree}
+                                />
+                            </Form.Item>
+                        </Col>
+                    </Row>
+                    <Row gutter={16}>
+                        <Col span={24}>
+                            <Form.Item
                                 name="password"
                                 label="密码"
-                                rules={[{ required: true, message: '请输入新用户密码' }]}
+                                rules={[{ required: true, message: '请输入新用户密码' }, { min: 3, message: '密码最少3个字符' }, { pattern: /^[^\s]+$/, message: '不能包含空格' }]}
                             >
                                 <Input.Password placeholder="请输入新用户密码" />
                             </Form.Item>

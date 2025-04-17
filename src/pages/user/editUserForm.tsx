@@ -1,27 +1,33 @@
-import React, { useEffect } from 'react';
-import { Input, Button, Form, Col, Row, Select, DatePicker, Drawer, FormInstance, Switch } from 'antd';
+import React, { useEffect, useState } from 'react';
+import { Input, Button, Form, Col, Row, Select, DatePicker, Drawer, FormInstance, Switch, TreeDataNode, TreeSelect } from 'antd';
 import { UserListModel } from '../../models/userModel';
 import dayjs from 'dayjs';
 
 interface EditUserFormProps {
     form: FormInstance
     open: boolean;
+    departmentTree: TreeDataNode[] | [];
     editUser: UserListModel | null;
     hideEditUserDrawer: () => void;
     onFinish: (values: any) => void;
 }
-const EditUserForm: React.FC<EditUserFormProps> = ({ form, open, editUser, hideEditUserDrawer, onFinish }) => {
+const EditUserForm: React.FC<EditUserFormProps> = ({ form, open, departmentTree, editUser, hideEditUserDrawer, onFinish }) => {
+    const [topDepValue, setValue] = useState<number>(1);
+
+    const onChange = (newValue: number) => {
+        setValue(topDepValue);
+    };
     useEffect(() => {
         if (editUser) {
-          form.setFieldsValue({
-            ...editUser,
-            birthday: editUser.birthday ? dayjs(editUser.birthday) : null,
-            gender: editUser?.gender !== undefined ? String(editUser.gender) : '1'
-          });
+            form.setFieldsValue({
+                ...editUser,
+                birthday: editUser.birthday ? dayjs(editUser.birthday) : null,
+                gender: editUser?.gender !== undefined ? String(editUser.gender) : '1'
+            });
         } else {
-          form.resetFields();
+            form.resetFields();
         }
-      }, [editUser]);
+    }, [editUser]);
 
     const onFinishFailed = (errorInfo: any) => {
         console.log('Failed:', errorInfo);
@@ -47,7 +53,7 @@ const EditUserForm: React.FC<EditUserFormProps> = ({ form, open, editUser, hideE
                                 name="name"
                                 label="姓名"
                                 initialValue={editUser?.name}
-                                rules={[{ required: true, message: '用户姓名不能为空' }]}
+                                rules={[{ required: true, message: '用户姓名不能为空' }, { whitespace: true, message: '用户名不能包含空格' }]}
                             >
                                 <Input placeholder="请输入用户姓名" />
                             </Form.Item>
@@ -97,6 +103,27 @@ const EditUserForm: React.FC<EditUserFormProps> = ({ form, open, editUser, hideE
                                 initialValue={editUser?.birthday ? dayjs(editUser.birthday) : null}
                             >
                                 <DatePicker style={{ width: '100%' }} getPopupContainer={(trigger) => trigger.parentElement!} />
+                            </Form.Item>
+                        </Col>
+                    </Row>
+                    <Row gutter={16}>
+                        <Col span={24}>
+                            <Form.Item
+                                name="departmentId"
+                                label="部门"
+                                rules={[{ required: true, message: '请选择部门' }]}
+                            >
+                                <TreeSelect
+                                    showSearch
+                                    style={{ width: '100%' }}
+                                    value={topDepValue}
+                                    dropdownStyle={{ maxHeight: 400, overflow: 'auto' }}
+                                    onChange={onChange}
+                                    placeholder="Please select"
+                                    allowClear
+                                    treeDefaultExpandAll
+                                    treeData={departmentTree}
+                                />
                             </Form.Item>
                         </Col>
                     </Row>

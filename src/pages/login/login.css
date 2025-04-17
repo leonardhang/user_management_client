@@ -50,3 +50,6 @@
 a {
     color: rgb(23, 131, 231);
 }
+.login-err {
+    color: red;
+}

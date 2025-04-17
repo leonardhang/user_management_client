@@ -1,6 +1,6 @@
 import React, { useState, useEffect, ReactNode } from 'react';
 import { Space, Table, Tag, Flex, Input, Dropdown, Typography, Button, Form, notification } from 'antd';
-import type { TableProps } from 'antd';
+import type { TableProps, TreeDataNode } from 'antd';
 import { DownOutlined, SmileOutlined } from '@ant-design/icons';
 import { UserFilterModel, UserListModel, UserStatus } from '../../models/userModel';
 import { formatDate } from '../../utils/common';
@@ -11,6 +11,8 @@ import './user.css';
 import NewUserForm from './addUserForm';
 import EditUserForm from './editUserForm';
 import DeleteUserDialog from './deleteUserDialog';
+import { getAllDepartment } from '../../services/departmentService';
+import { DepartmentModel } from '../../models/departmentModel';
 
 const genderItems: { key: number; label: string }[] = [
     {
@@ -45,7 +47,38 @@ const UserListPage: React.FC = () => {
             fetchUserList(page);
         }
     });
+    const [departmentTree, setDepartmentTree] = useState<TreeDataNode[]>([]);
+    const fetchDepartmentList = async (): Promise<void> => {
+        try {
+            const res = await getAllDepartment();
+            const results: TreeDataNode[] = [];
+            res.forEach((dep: DepartmentModel) => {
+                results.push({
+                    key: dep.id,
+                    value: dep.id,
+                    title: dep.name,
+                    children: dep.children ? dep.children.map(child => ({
+                        key: child.id,
+                        value: child.id,
+                        title: child.name,
+                        children: child.children ? child.children.map(grandChild => ({
+                            key: grandChild.id,
+                            value: grandChild.id,
+                            title: grandChild.name,
+                            children: []
+                        })) : []
+                    })) : []
+                } as TreeDataNode);
+            });
+            setDepartmentTree(results);
+        } catch (error) {
+            console.error('Error fetching user list:', error);
+        }
+    };
 
+    useEffect(() => {
+        fetchDepartmentList();
+    }, []);
     const columns: TableProps<UserListModel>['columns'] = [
         {
             title: '姓名',
@@ -94,6 +127,12 @@ const UserListPage: React.FC = () => {
                     </Tag>
                 );
             },
+        },
+        {
+            title: '部门',
+            dataIndex: 'departmentName',
+            key: 'departmentName',
+            render: (departmentName) => <label>{departmentName}</label>,
         },
         {
             title: '操作',
@@ -172,7 +211,9 @@ const UserListPage: React.FC = () => {
         newUserForm.resetFields();
     }
     const saveNewUser = async (values: any) => {
-        values.birthday = values.birthday.format('YYYY-MM-DD');
+        if (values.birthday) {
+            values.birthday = values.birthday.format('YYYY-MM-DD');
+        }
         const addResult = await addUser(values);
         if (addResult > 0) {
             setShowAddUserDrawer(false);
@@ -224,13 +265,16 @@ const UserListPage: React.FC = () => {
         editUserForm.resetFields();
     }
     const handleEditUser = async (values: any) => {
-        values.birthday = values.birthday.format('YYYY-MM-DD');
+        if (values.birthday) {
+            values.birthday = values.birthday.format('YYYY-MM-DD');
+        }
         targetUser!.birthday = values.birthday;
         targetUser!.name = values.name;
         targetUser!.nickName = values.nickName;
         targetUser!.phoneNumber = values.phoneNumber;
         targetUser!.gender = values.gender;
         targetUser!.status = values.status ? 1 : 0;
+        targetUser!.departmentId = values.departmentId;
         const editResult = await updateUser(targetUser);
         if (editResult > 0) {
             setShowEditUserDrawer(false);
@@ -276,9 +320,9 @@ const UserListPage: React.FC = () => {
                 <Button type="primary" onClick={showNewUserDrawer}>添加用户</Button>
             </Flex>
             <Table<UserListModel> columns={columns} dataSource={userList} pagination={pagination} />
-            <NewUserForm form={newUserForm} open={showAddUserDrawer} hideAddUserDrawer={hideAddUserDrawer} onFinish={saveNewUser}></NewUserForm>
+            <NewUserForm form={newUserForm} open={showAddUserDrawer} departmentTree={departmentTree} hideAddUserDrawer={hideAddUserDrawer} onFinish={saveNewUser}></NewUserForm>
             <DeleteUserDialog open={isShowDeleteUserDialog} deleteUser={targetUser} confirmLoading={isShowDeleteUserConfirmLoading} handleOk={handleDelete} handleCancel={handleDeleteCancel}></DeleteUserDialog>
-            <EditUserForm open={showEditUserDrawer} editUser={targetUser} form={editUserForm} hideEditUserDrawer={handleEditUserCancel} onFinish={handleEditUser}></EditUserForm>
+            <EditUserForm open={showEditUserDrawer} departmentTree={departmentTree} editUser={targetUser} form={editUserForm} hideEditUserDrawer={handleEditUserCancel} onFinish={handleEditUser}></EditUserForm>
         </>
     );
 };

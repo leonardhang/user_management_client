@@ -8,6 +8,8 @@ export interface UserListModel {
     birthday: Date;
     status: number;
     createTime: Date;
+    departmentId: number | null,
+    departmentName: string | null,
 }
 
 export enum UserStatus {

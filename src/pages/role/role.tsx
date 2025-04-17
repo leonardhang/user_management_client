@@ -85,16 +85,20 @@ const RolePage: React.FC = () => {
     }
     const saveRole = async (values: RoleModel) => {
         if (isNew) {
-            const addResult = await addRole(values);
-            if (addResult > 0) {
-                setIsShowRoleDrawer(false);
-                openNotification("添加角色成功", "", <SmileOutlined></SmileOutlined>);
-                roleForm.resetFields();
-                await fetchRoleList(pagination.current);
+            addRole(values).then(addResult => {
+                if (addResult > 0) {
+                    setIsShowRoleDrawer(false);
+                    openNotification("添加角色成功", "", <SmileOutlined></SmileOutlined>);
+                    roleForm.resetFields();
+                    fetchRoleList(pagination.current);
 
-            } else {
-                openNotification("添加角色失败", "请检查数据，重新再试一次。", <SmileOutlined></SmileOutlined>);
-            }
+                } else {
+                    openNotification("添加角色失败", "请检查数据，重新再试一次。", <SmileOutlined></SmileOutlined>);
+                }
+            }).catch(err => {
+                openNotification("添加角色失败", err.response.data, <SmileOutlined></SmileOutlined>);
+            });
+
         } else {
             if (targetRole) {
                 targetRole.name = values.name;
